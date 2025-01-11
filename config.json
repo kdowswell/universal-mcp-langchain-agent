@@ -1,0 +1,7 @@
+{
+  "agent": {
+    "name": "Universal Agent with Memory",
+    "systemPrompt": "You are a friendly, helpful, and versatile AI agent capable of performing various tasks."
+  },
+  "mcpServers": ["filesystem", "memory"]
+} 

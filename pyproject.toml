@@ -1,0 +1,86 @@
+[project]
+name = "universal-agent"
+version = "0.1.0"
+description = "Universal LLM Agent with Model Context Protocol (MCP) server tools"
+readme = "README.md"
+authors = [
+    { name = "Kurt Dowswell", email = "kdowswell@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "langchain-core~=0.3.21",
+    "mcp~=1.0.0",
+    "pydantic~=2.10.2",
+    "typing-extensions~=4.12.2",
+    "python-dotenv~=1.0.1",
+    "langchain-groq~=0.2.1",
+    "langchain-mcp~=0.1.0",
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[dependency-groups]
+dev = [
+    "langchain-tests~=0.3.4",
+    "pytest~=8.3.3",
+    "pytest-asyncio~=0.24.0",
+    "pytest-socket~=0.7.0",
+    "ruff~=0.8.0",
+    "mypy~=1.13.0",
+    "langchain-groq~=0.2.1",
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = [
+    # flake8-2020
+    "YTT",
+    # flake8-bandit
+    "S",
+    # flake8-bugbear
+    "B",
+    # flake8-builtins
+    "A",
+    # Pyflakes
+    "F",
+    # Pycodestyle
+    "E",
+    "W",
+    # isort
+    "I",
+    # flake8-no-pep420
+    "INP",
+    # pyupgrade
+    "UP",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "INP001"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "class"
+
+[tool.mypy]
+disallow_untyped_defs = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+strict_equality = true
+no_implicit_optional = true
+show_error_codes = true
+files = ["src/**/*.py", "tests/demo.py"]
