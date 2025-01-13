@@ -76,6 +76,14 @@ def get_server_configs() -> list[ServerConfig]:
                 args=["-y", "@modelcontextprotocol/server-brave-search"],
                 env={**env, "BRAVE_API_KEY": os.environ.get("BRAVE_API_KEY")}
             )
+        ),
+        ServerConfig(
+            name="sequential-thinking",
+            server_params=StdioServerParameters(
+                command=npx_path,
+                args=["-y", "@modelcontextprotocol/server-sequential-thinking"],
+                env=env
+            )
         )
     ]
 

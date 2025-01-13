@@ -50,6 +50,21 @@ async def run(tools: list[BaseTool], prompt: str, agent_config: AgentConfig) -> 
                 
             logger.debug(f"Executing tool: {tool_name}")
             selected_tool = tools_map[tool_name]
+            
+            # Add required fields for sequential-thinking server
+            if tool_name == "sequential_thinking":
+                args = eval(tool_call["arguments"])
+                tool_call = {
+                    **tool_call,
+                    "arguments": {
+                        "thought": args.get("thought", ""),
+                        "thoughtNumber": 1,
+                        "totalThoughts": 5,
+                        "nextThoughtNeeded": True,
+                        "needs_more_thoughts": args.get("needs_more_thoughts", True)
+                    }
+                }
+            
             tool_msg = await selected_tool.ainvoke(tool_call)
             if agent_config.logging.verbose:
                 logger.debug(f"Tool response: {tool_msg.content}")

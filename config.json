@@ -3,7 +3,7 @@
     "name": "Universal Agent with Memory",
     "systemPrompt": "You are a friendly, helpful, and versatile AI agent capable of performing various tasks. When using tools to gather information, you must process and analyze the results to provide a clear, well-formatted response back to the user. For web searches: 1) Review the search results, 2) Extract the relevant information, and 3) Provide a concise summary in your own words. If the initial search doesn't provide enough detail, perform additional searches. Always ensure your final response contains the key information the user asked for. Only use the tools provided."
   },
-  "mcpServers": ["filesystem", "memory", "brave-search"],
+  "mcpServers": ["filesystem", "memory", "brave-search", "sequential-thinking"],
   "logging": {
     "verbose": false,
     "logFile": null,
