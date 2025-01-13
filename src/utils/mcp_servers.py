@@ -1,5 +1,6 @@
 import pathlib
 import json
+import os
 from dataclasses import dataclass
 from contextlib import AsyncExitStack
 from typing import AsyncIterator
@@ -14,8 +15,7 @@ from langchain_mcp import MCPToolkit
 class ServerConfig:
     """Configuration for an MCP server."""
     name: str
-    command: str
-    args: list[str]
+    server_params: StdioServerParameters
 
 
 def get_server_configs() -> list[ServerConfig]:
@@ -29,15 +29,18 @@ def get_server_configs() -> list[ServerConfig]:
     all_servers = [
         ServerConfig(
             name="filesystem",
-            command="npx",
-            args=["-y", "@modelcontextprotocol/server-filesystem", str(pathlib.Path(__file__).parent.parent.parent)]
+            server_params=StdioServerParameters(
+                command="npx",
+                args=["-y", "@modelcontextprotocol/server-filesystem", str(pathlib.Path(__file__).parent.parent.parent)],
+            )
         ),
         ServerConfig(
             name="memory",
-            command="npx",
-            args=["-y", "@modelcontextprotocol/server-memory"]
+            server_params=StdioServerParameters(
+                command="npx",
+                args=["-y", "@modelcontextprotocol/server-memory"],            
+            )
         ),
-        # Add more servers here as needed
     ]
 
     # Filter servers based on config
@@ -55,7 +58,7 @@ class MCPServers:
     async def __aenter__(self) -> "MCPServers":
         for config in self.configs:
             read, write = await self.exit_stack.enter_async_context(
-                stdio_client(StdioServerParameters(command=config.command, args=config.args))
+                stdio_client(config.server_params)
             )
             session = await self.exit_stack.enter_async_context(ClientSession(read, write))
             self.sessions[config.name] = session

@@ -6,8 +6,6 @@ class AgentConfig:
     """Configuration for the AI agent."""
     name: str
     system_prompt: str
-    inputs: list[str]
-    outputs: list[str]
 
 def load_agent_config() -> AgentConfig:
     """Load agent configuration from config.json."""
@@ -16,7 +14,5 @@ def load_agent_config() -> AgentConfig:
         agent_config = config["agent"]
         return AgentConfig(
             name=agent_config["name"],
-            system_prompt=agent_config["systemPrompt"],
-            inputs=agent_config["inputs"],
-            outputs=agent_config["outputs"]
+            system_prompt=agent_config["systemPrompt"]
         ) 
