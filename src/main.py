@@ -4,6 +4,7 @@ import sys
 import typing as t
 import logging
 from typing import AsyncIterator
+import json
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_core.output_parsers import StrOutputParser
@@ -52,18 +53,24 @@ async def run(tools: list[BaseTool], prompt: str, agent_config: AgentConfig) -> 
             selected_tool = tools_map[tool_name]
             
             # Add required fields for sequential-thinking server
-            if tool_name == "sequential_thinking":
-                args = eval(tool_call["arguments"])
+            if tool_name == "sequentialthinking":
+                args = json.loads(tool_call.args)
+                logger.debug(f"Sequential thinking raw args: {args}")
                 tool_call = {
-                    **tool_call,
+                    "name": "sequentialthinking",
                     "arguments": {
                         "thought": args.get("thought", ""),
-                        "thoughtNumber": 1,
-                        "totalThoughts": 5,
-                        "nextThoughtNeeded": True,
-                        "needs_more_thoughts": args.get("needs_more_thoughts", True)
+                        "thoughtNumber": args.get("thoughtNumber", 1),
+                        "totalThoughts": args.get("totalThoughts", 5),
+                        "isRevision": args.get("isRevision", False),
+                        "revisesThought": args.get("revisesThought"),
+                        "branchFromThought": args.get("branchFromThought"),
+                        "branchId": args.get("branchId"),
+                        "needsMoreThoughts": args.get("needsMoreThoughts", True),
+                        "nextThoughtNeeded": args.get("nextThoughtNeeded", True)
                     }
                 }
+                logger.debug(f"Sequential thinking processed args: {tool_call['arguments']}")
             
             tool_msg = await selected_tool.ainvoke(tool_call)
             if agent_config.logging.verbose:
