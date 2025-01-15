@@ -8,7 +8,7 @@ A flexible agent architecture for creating and configuring AI agents with custom
 - [x] Flexible tool integration
 - [x] Support for multiple MCP servers (expanding)
 - [x] Quick setup and modification of agent behaviors
-- [ ] Add more MCP servers
+- [x] Add more MCP servers
 - [ ] Support multiple LLM providers
 
 ## Getting Started
@@ -48,6 +48,49 @@ source .venv/bin/activate  # On Unix/MacOS
 # Then run the agent:
 python src/main.py "Read and summarize the contents of README.md"
 ```
+
+## Configuring the Agent
+
+The agent's behavior can be customized through the `config.json` file in the project root:
+
+```json
+{
+  "agent": {
+    "name": "Universal Agent",
+    "systemPrompt": "Your custom system prompt here"
+  },
+  "mcpServers": ["filesystem", "memory", "brave-search", "sequential-thinking", "github"],
+  "logging": {
+    "verbose": true,
+    "logFile": null,
+    "levels": {
+      "server": "DEBUG",
+      "agent": "DEBUG",
+      "tools": "DEBUG"
+    }
+  }
+}
+```
+
+### Configuration Options
+
+1. **Agent Configuration**:
+   - `name`: Set a custom name for your agent
+   - `systemPrompt`: Define the agent's personality and behavior through a custom system prompt
+
+2. **Tool Integration**:
+   - `mcpServers`: List of enabled MCP servers that provide tools to the agent
+   - Available servers:
+     - `filesystem`: File operations
+     - `memory`: Memory management
+     - `brave-search`: Web search capabilities (requires `BRAVE_API_KEY`)
+     - `sequential-thinking`: Advanced reasoning
+     - `github`: GitHub integration (requires `GITHUB_PERSONAL_ACCESS_TOKEN`)
+
+3. **Logging Configuration**:
+   - `verbose`: Enable/disable detailed logging
+   - `logFile`: Specify a log file path (or `null` for console only)
+   - `levels`: Set logging levels for different components
 
 ## Current Status
 
