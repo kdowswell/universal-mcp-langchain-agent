@@ -33,15 +33,31 @@ async def run(tools: list[BaseTool], prompt: str, agent_config: AgentConfig) -> 
         HumanMessage(content=prompt)
     ]
     
-    # Get initial response from model
-    logger.debug("Sending initial request to model...")
-    ai_message = t.cast(AIMessage, await tools_model.ainvoke(messages))
-    if agent_config.logging.verbose:
-        logger.debug(f"Initial AI response: {ai_message.content}")
-    messages.append(ai_message)
-    
-    # Handle tool calls if any
-    if ai_message.tool_calls:
+    while True:
+        # Get response from model
+        logger.debug("Sending request to model...")
+        response = await tools_model.ainvoke(messages)
+        if agent_config.logging.verbose:
+            logger.debug(f"Raw model response: {response}")
+            
+        # Convert response to AIMessage if it isn't already
+        if not isinstance(response, AIMessage):
+            ai_message = AIMessage(content=response)
+        else:
+            ai_message = response
+            
+        if agent_config.logging.verbose:
+            logger.debug(f"AI message content: {ai_message.content}")
+            logger.debug(f"AI message tool calls: {ai_message.tool_calls}")
+            
+        messages.append(ai_message)
+        
+        # If no tool calls, we're done
+        if not ai_message.tool_calls:
+            logger.debug("No more tool calls, returning final response")
+            return ai_message.content
+        
+        # Handle tool calls
         logger.debug(f"Tool calls requested: {len(ai_message.tool_calls)}")
         for tool_call in ai_message.tool_calls:
             tool_name = tool_call["name"].lower()
@@ -76,17 +92,6 @@ async def run(tools: list[BaseTool], prompt: str, agent_config: AgentConfig) -> 
             if agent_config.logging.verbose:
                 logger.debug(f"Tool response: {tool_msg.content}")
             messages.append(tool_msg)
-        
-        # Get final response after tool usage
-        logger.debug("Getting final response from model...")
-        final_response = await (tools_model | StrOutputParser()).ainvoke(messages)
-        if agent_config.logging.verbose:
-            logger.debug(f"Final response: {final_response}")
-        return final_response
-    
-    # If no tools were used, return the AI's direct response
-    logger.debug("No tools were used, returning direct response")
-    return ai_message.content
 
 async def main(prompt: str) -> None:
     """Main entry point for the application."""

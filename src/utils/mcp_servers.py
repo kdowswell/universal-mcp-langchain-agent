@@ -84,6 +84,14 @@ def get_server_configs() -> list[ServerConfig]:
                 args=["-y", "@modelcontextprotocol/server-sequential-thinking"],
                 env=env
             )
+        ),
+        ServerConfig(
+            name="github",
+            server_params=StdioServerParameters(
+                command="docker",
+                args=["run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "mcp/github"],
+                env={**env, "GITHUB_PERSONAL_ACCESS_TOKEN": os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN")}
+            )
         )
     ]
 
