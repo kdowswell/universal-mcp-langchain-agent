@@ -10,6 +10,7 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.tools import BaseTool
 from langchain_groq import ChatGroq
+from langchain_anthropic import ChatAnthropic
 
 from src.utils.mcp_servers import get_server_configs, MCPServers, get_all_tools
 from src.utils.agent_config import AgentConfig, load_agent_config
@@ -25,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 async def run(tools: list[BaseTool], prompt: str, agent_config: AgentConfig) -> str:
     """Run the agent with the given tools and prompt."""
-    model = ChatGroq(model="llama-3.1-8b-instant", stop_sequences=None) 
+    model = ChatAnthropic(model="claude-3-5-sonnet-latest")
     tools_map = {tool.name: tool for tool in tools}
     tools_model = model.bind_tools(tools)
     
