@@ -4,13 +4,15 @@ from typing import Any, Dict, Optional
 from langchain_core.language_models import BaseChatModel
 from langchain_groq import ChatGroq
 from langchain_anthropic import ChatAnthropic
+from langchain_ollama import ChatOllama
 
 class ModelHandler:
     """Handler class for managing different LLM providers."""
     
     SUPPORTED_PROVIDERS = {
         "groq": ChatGroq,
-        "anthropic": ChatAnthropic
+        "anthropic": ChatAnthropic,
+        "ollama": ChatOllama
     }
     
     def __init__(self, config: Dict[str, Any]):

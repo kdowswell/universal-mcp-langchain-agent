@@ -35,6 +35,7 @@ uv pip install -e .
 4. Get API keys for your preferred model provider:
    - [Groq API key](https://groq.com/) for using Groq models
    - [Anthropic API key](https://www.anthropic.com/) for using Claude models
+   - [Ollama](https://ollama.com/) for using local models (no API key required)
 
 5. Create a `.env` file in the project root with your chosen provider's API key:
 ```sh
@@ -97,6 +98,16 @@ The agent's behavior can be customized through the `config.json` file in the pro
    ```
 
    Supported providers and models:
+   - Ollama:
+     ```json
+     {
+       "provider": "ollama",
+       "name": "llama3.2:latest",
+       "options": {
+         "stop_sequences": null
+       }
+     }
+     ```
    - Anthropic:
      ```json
      {
