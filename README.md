@@ -9,7 +9,8 @@ A flexible agent architecture for creating and configuring AI agents with custom
 - [x] Support for multiple MCP servers (expanding)
 - [x] Quick setup and modification of agent behaviors
 - [x] Add more MCP servers
-- [ ] Support multiple LLM providers
+- [x] Support multiple LLM providers (Anthropic, Groq)
+- [ ] OpenAI support (GPT-4, etc.)
 
 ## Getting Started
 
@@ -31,11 +32,17 @@ source .venv/bin/activate  # On Unix/MacOS
 uv pip install -e .
 ```
 
-4. Get a [Groq API key](https://groq.com/)
+4. Get API keys for your preferred model provider:
+   - [Groq API key](https://groq.com/) for using Groq models
+   - [Anthropic API key](https://www.anthropic.com/) for using Claude models
 
-5. Create a `.env` file in the project root:
+5. Create a `.env` file in the project root with your chosen provider's API key:
 ```sh
-GROQ_API_KEY=your_api_key_here
+# For Groq:
+GROQ_API_KEY=your_groq_api_key_here
+
+# For Anthropic:
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
 ```
 
 6. Run the agent (make sure your virtual environment is activated):
@@ -74,7 +81,44 @@ The agent's behavior can be customized through the `config.json` file in the pro
 
 ### Configuration Options
 
-1. **Agent Configuration**:
+1. **Model Configuration**:
+   The `model` section in `config.json` allows you to specify which LLM provider and model to use:
+
+   ```json
+   {
+     "model": {
+       "provider": "anthropic",
+       "name": "claude-3-5-sonnet-latest",
+       "options": {
+         "stop_sequences": null
+       }
+     }
+   }
+   ```
+
+   Supported providers and models:
+   - Anthropic:
+     ```json
+     {
+       "provider": "anthropic",
+       "name": "claude-3-5-sonnet-latest",
+       "options": {
+         "stop_sequences": null
+       }
+     }
+     ```
+   - Groq:
+     ```json
+     {
+       "provider": "groq",
+       "name": "llama-3.1-8b-instant",
+       "options": {
+         "stop_sequences": null
+       }
+     }
+     ```
+
+2. **Agent Configuration**:
    - `name`: Set a custom name for your agent
    - `systemPrompt`: Define the agent's personality and behavior through a custom system prompt
 

@@ -9,24 +9,23 @@ import json
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.tools import BaseTool
-from langchain_groq import ChatGroq
-from langchain_anthropic import ChatAnthropic
+from langchain_core.language_models import BaseChatModel
 
 from src.utils.mcp_servers import get_server_configs, MCPServers, get_all_tools
 from src.utils.agent_config import AgentConfig, load_agent_config
+from src.utils.model_handler import ModelHandler
 
 load_dotenv()
 
 # Configure module logger
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-async def run(tools: list[BaseTool], prompt: str, agent_config: AgentConfig) -> str:
+async def run(tools: list[BaseTool], prompt: str, agent_config: AgentConfig, model: BaseChatModel) -> str:
     """Run the agent with the given tools and prompt."""
-    model = ChatAnthropic(model="claude-3-5-sonnet-latest")
     tools_map = {tool.name: tool for tool in tools}
     tools_model = model.bind_tools(tools)
     
@@ -70,26 +69,6 @@ async def run(tools: list[BaseTool], prompt: str, agent_config: AgentConfig) -> 
             logger.debug(f"Executing tool: {tool_name}")
             selected_tool = tools_map[tool_name]
             
-            # Add required fields for sequential-thinking server
-            if tool_name == "sequentialthinking":
-                args = json.loads(tool_call.args)
-                logger.debug(f"Sequential thinking raw args: {args}")
-                tool_call = {
-                    "name": "sequentialthinking",
-                    "arguments": {
-                        "thought": args.get("thought", ""),
-                        "thoughtNumber": args.get("thoughtNumber", 1),
-                        "totalThoughts": args.get("totalThoughts", 5),
-                        "isRevision": args.get("isRevision", False),
-                        "revisesThought": args.get("revisesThought"),
-                        "branchFromThought": args.get("branchFromThought"),
-                        "branchId": args.get("branchId"),
-                        "needsMoreThoughts": args.get("needsMoreThoughts", True),
-                        "nextThoughtNeeded": args.get("nextThoughtNeeded", True)
-                    }
-                }
-                logger.debug(f"Sequential thinking processed args: {tool_call['arguments']}")
-            
             tool_msg = await selected_tool.ainvoke(tool_call)
             logger.debug(f"Tool response: {tool_msg.content}")
             messages.append(tool_msg)
@@ -97,12 +76,19 @@ async def run(tools: list[BaseTool], prompt: str, agent_config: AgentConfig) -> 
 async def main(prompt: str) -> None:
     """Main entry point for the application."""
     try:
+        # Load configurations
+        with open('config.json', 'r') as f:
+            config = json.load(f)
         agent_config = load_agent_config()
+        
+        # Initialize model handler
+        model_handler = ModelHandler(config['model'])
+        model = model_handler.get_model()
         server_configs = get_server_configs()
         
         async with MCPServers(server_configs) as servers:
             all_tools = await get_all_tools(servers)
-            response = await run(all_tools, prompt, agent_config)
+            response = await run(all_tools, prompt, agent_config, model)
             
             print("\nAgent Response:")
             print("--------------")
