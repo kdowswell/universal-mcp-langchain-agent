@@ -17,7 +17,11 @@ from src.utils.agent_config import AgentConfig, load_agent_config
 load_dotenv()
 
 # Configure module logger
-logger = logging.getLogger("agent")
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 async def run(tools: list[BaseTool], prompt: str, agent_config: AgentConfig) -> str:
     """Run the agent with the given tools and prompt."""
@@ -25,8 +29,7 @@ async def run(tools: list[BaseTool], prompt: str, agent_config: AgentConfig) -> 
     tools_map = {tool.name: tool for tool in tools}
     tools_model = model.bind_tools(tools)
     
-    if agent_config.logging.verbose:
-        logger.debug(f"Available tools: {list(tools_map.keys())}")
+    logger.debug(f"Available tools: {list(tools_map.keys())}")
     
     messages: list[BaseMessage] = [
         SystemMessage(content=agent_config.system_prompt),
@@ -37,8 +40,7 @@ async def run(tools: list[BaseTool], prompt: str, agent_config: AgentConfig) -> 
         # Get response from model
         logger.debug("Sending request to model...")
         response = await tools_model.ainvoke(messages)
-        if agent_config.logging.verbose:
-            logger.debug(f"Raw model response: {response}")
+        logger.debug(f"Raw model response: {response}")
             
         # Convert response to AIMessage if it isn't already
         if not isinstance(response, AIMessage):
@@ -46,9 +48,8 @@ async def run(tools: list[BaseTool], prompt: str, agent_config: AgentConfig) -> 
         else:
             ai_message = response
             
-        if agent_config.logging.verbose:
-            logger.debug(f"AI message content: {ai_message.content}")
-            logger.debug(f"AI message tool calls: {ai_message.tool_calls}")
+        logger.debug(f"AI message content: {ai_message.content}")
+        logger.debug(f"AI message tool calls: {ai_message.tool_calls}")
             
         messages.append(ai_message)
         
@@ -89,8 +90,7 @@ async def run(tools: list[BaseTool], prompt: str, agent_config: AgentConfig) -> 
                 logger.debug(f"Sequential thinking processed args: {tool_call['arguments']}")
             
             tool_msg = await selected_tool.ainvoke(tool_call)
-            if agent_config.logging.verbose:
-                logger.debug(f"Tool response: {tool_msg.content}")
+            logger.debug(f"Tool response: {tool_msg.content}")
             messages.append(tool_msg)
 
 async def main(prompt: str) -> None:

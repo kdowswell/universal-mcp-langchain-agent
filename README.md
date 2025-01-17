@@ -87,10 +87,6 @@ The agent's behavior can be customized through the `config.json` file in the pro
      - `sequential-thinking`: Advanced reasoning
      - `github`: GitHub integration (requires `GITHUB_PERSONAL_ACCESS_TOKEN`)
 
-3. **Logging Configuration**:
-   - `verbose`: Enable/disable detailed logging
-   - `logFile`: Specify a log file path (or `null` for console only)
-   - `levels`: Set logging levels for different components
 
 ## Current Status
 

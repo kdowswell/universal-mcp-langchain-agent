@@ -14,7 +14,11 @@ from mcp.client.stdio import stdio_client
 from langchain_mcp import MCPToolkit
 
 # Configure module logger
-logger = logging.getLogger("server")
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 @dataclass
 class ServerConfig:
@@ -111,7 +115,7 @@ class MCPServers:
     async def __aenter__(self) -> "MCPServers":
         for config in self.configs:
             try:
-                logger.info(f"Starting server: {config.name}")
+                logger.debug(f"Starting server: {config.name}")
                 read, write = await self.exit_stack.enter_async_context(
                     stdio_client(config.server_params)
                 )
@@ -135,15 +139,15 @@ class MCPServers:
 
 async def get_all_tools(servers: MCPServers) -> list[BaseTool]:
     """Initialize and get tools from all servers."""
-    tools_logger = logging.getLogger("tools")
+    logger = logging.getLogger(__name__)
     all_tools = []
     
     for name, session in servers.sessions.items():
-        tools_logger.debug(f"Initializing tools for server: {name}")
+        logger.debug(f"Initializing tools for server: {name}")
         toolkit = MCPToolkit(session=session)
         await toolkit.initialize()
         tools = toolkit.get_tools()
         all_tools.extend(tools)
-        tools_logger.debug(f"Added {len(tools)} tools from server: {name}")
+        logger.debug(f"Added {len(tools)} tools from server: {name}")
     
     return all_tools 
