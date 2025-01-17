@@ -68,15 +68,6 @@ The agent's behavior can be customized through the `config.json` file in the pro
     "systemPrompt": "Your custom system prompt here"
   },
   "mcpServers": ["filesystem", "memory", "brave-search", "sequential-thinking", "github"],
-  "logging": {
-    "verbose": true,
-    "logFile": null,
-    "levels": {
-      "server": "DEBUG",
-      "agent": "DEBUG",
-      "tools": "DEBUG"
-    }
-  }
 }
 ```
 
